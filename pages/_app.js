@@ -1,4 +1,4 @@
-import 'resume/styles/globals.css'
+import '../styles/globals.css'
 
 import { storyblokInit, apiPlugin } from "@storyblok/react";
 import Person from "../components/genericComponents/Person/Person";
@@ -11,7 +11,7 @@ const components = {
 };
 
 storyblokInit({
-  accessToken: process.env.STORYBLOK_API_KEY},
+  accessToken: `${process.env.STORYBLOK_API_KEY}`,
   use: [apiPlugin],
   components,
 });
