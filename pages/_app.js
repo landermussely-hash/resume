@@ -11,7 +11,7 @@ const components = {
 };
 
 storyblokInit({
-  accessToken: "DeReSOlrmX85GW74jr6zMgtt",
+  accessToken: `${process.env.STORYBLOK_API_KEY}`,
   use: [apiPlugin],
   components,
 });
