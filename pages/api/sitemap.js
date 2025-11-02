@@ -8,7 +8,7 @@ export default async function handler(req, res) {
 
   // Instructing the Vercel edge to cache the file
   res.setHeader('Cache-control', 'stale-while-revalidate, s-maxage=3600')
-
+ 
   //getting paths
   const storyblokApi = getStoryblokApi();
   let homelink = {
