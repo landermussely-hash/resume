@@ -1,5 +1,5 @@
 import '../styles/globals.css'
- 
+
 import { storyblokInit, apiPlugin } from "@storyblok/react";
 import Person from "../components/genericComponents/Person/Person";
 import Experience from '../components/genericComponents/Experience/Experience';
