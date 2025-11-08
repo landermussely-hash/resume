@@ -14,6 +14,7 @@ export default class Person extends Component {
 			<>
 				<div {...storyblokEditable(blok)} className={css["wrapper"]}>
 					<div className={css["content"]}>
+						
 						{/* Header */}
 						<div className={[css["box"], css["head"]].join(" ")}>
 							<h1>
@@ -24,13 +25,13 @@ export default class Person extends Component {
 						{/* Sidebar */}
 						<div className={[css["box"], css["sidebar"]].join(" ")}>
 							<div className={css["personalimage"]}>
-								{blok.photo && blok.photo.filename ? (
+								{blok.image?.filename ? (
 									<img
-										src={blok.photo.filename}
+										src={blok.image.filename}
 										alt={`${blok.firstname} ${blok.lastname}`}
 									/>
 								) : (
-									<p>No photo available</p>
+									<p>No image available</p>
 								)}
 							</div>
 
@@ -66,6 +67,7 @@ export default class Person extends Component {
 								{new Date().getFullYear()}
 							</div>
 						</div>
+
 					</div>
 				</div>
 			</>
