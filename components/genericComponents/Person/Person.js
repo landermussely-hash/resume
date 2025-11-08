@@ -25,9 +25,9 @@ export default class Person extends Component {
 						{/* Sidebar */}
 						<div className={[css["box"], css["sidebar"]].join(" ")}>
 							<div className={css["personalimage"]}>
-								{blok.image?.filename ? (
+								{blok.image ? (
 									<img
-										src={blok.image.filename}
+										src={blok.image}
 										alt={`${blok.firstname} ${blok.lastname}`}
 									/>
 								) : (
