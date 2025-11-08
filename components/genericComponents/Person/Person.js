@@ -3,40 +3,72 @@ import css from "./Person.module.scss";
 import { storyblokEditable, StoryblokComponent } from "@storyblok/react";
 
 export default class Person extends Component {
-
 	constructor(props) {
 		super(props);
 	}
-	//comment by Jan
+
 	render() {
+		const { blok } = this.props;
+
 		return (
 			<>
-				<div {...storyblokEditable(this.props.blok)} className={css["wrapper"]}>
+				<div {...storyblokEditable(blok)} className={css["wrapper"]}>
 					<div className={css["content"]}>
+						{/* Header */}
 						<div className={[css["box"], css["head"]].join(" ")}>
-							<h1>Resume {this.props.blok.title} {this.props.blok.lastname} {this.props.blok.firstname}</h1>
+							<h1>
+								Resume {blok.title} {blok.lastname} {blok.firstname}
+							</h1>
 						</div>
+
+						{/* Sidebar */}
 						<div className={[css["box"], css["sidebar"]].join(" ")}>
-							<div className={css["personalimage"]}><img src={this.props.blok.photo.filename} /></div>
+							<div className={css["personalimage"]}>
+								{blok.photo && blok.photo.filename ? (
+									<img
+										src={blok.photo.filename}
+										alt={`${blok.firstname} ${blok.lastname}`}
+									/>
+								) : (
+									<p>No photo available</p>
+								)}
+							</div>
+
 							<div className={css["personaldetails"]}>
-								<div className={css["personaldetailitem"]}>{this.props.blok.title} {this.props.blok.firstname} {this.props.blok.lastname}</div>
-								<div className={css["personaldetailitem"]}>{this.props.blok.dateofbirth}</div>
-								<div className={css["personaldetailitem"]}>{this.props.blok.location}</div>
+								<div className={css["personaldetailitem"]}>
+									{blok.title} {blok.firstname} {blok.lastname}
+								</div>
+								<div className={css["personaldetailitem"]}>
+									{blok.dateofbirth}
+								</div>
+								<div className={css["personaldetailitem"]}>
+									{blok.location}
+								</div>
 							</div>
 						</div>
+
+						{/* Experience */}
 						<div className={[css["box"], css["experience"]].join(" ")}>
 							<h2>Experience</h2>
-							{this.props.blok.experiences.map((nestedBlok) => (
-								<StoryblokComponent blok={nestedBlok} key={nestedBlok._uid} />
-							))}
+							{blok.experiences && blok.experiences.length > 0 ? (
+								blok.experiences.map((nestedBlok) => (
+									<StoryblokComponent blok={nestedBlok} key={nestedBlok._uid} />
+								))
+							) : (
+								<p>No experience added yet.</p>
+							)}
 						</div>
+
+						{/* Footer */}
 						<div className={[css["box"], css["foot"]].join(" ")}>
-							<div>&copy; {this.props.blok.firstname} {this.props.blok.lastname} {new Date().getFullYear()}</div>
+							<div>
+								&copy; {blok.firstname} {blok.lastname}{" "}
+								{new Date().getFullYear()}
+							</div>
 						</div>
 					</div>
 				</div>
 			</>
 		);
-		
 	}
 }
