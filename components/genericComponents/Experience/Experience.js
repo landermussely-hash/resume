@@ -1,36 +1,28 @@
 ﻿import React, { Component } from "react";
 import css from "./Experience.module.scss";
 import { storyblokEditable } from "@storyblok/react";
-import { RichTextToHTML } from "../../../functions/storyBlokRichTextRenderer";
-
+import {RichTextToHTML} from "../../../functions/storyBlokRichTextRenderer";
+//comment from jnmoons
 export default class Experience extends Component {
-  constructor(props) {
-    super(props);
-  }
 
-  render() {
-    const blok = this.props.blok;
+	constructor(props) {
+		super(props);
+	}
 
-    // Check of blok bestaat
-    if (!blok) {
-      return <div className={css["experienceitem"]}>No experience data available</div>;
-    }
-
-    return (
-      <div {...storyblokEditable(blok)} className={css["experienceitem"]}>
-        <div className={css["experienceheader"]}>
-          {/* Gebruik fallback text als start/enddate of title leeg is */}
-          <span className={css["experiencedate"]}>
-            {blok.startdate || "Start date"} - {blok.enddate || "End date"}
-          </span>
-          <span className={css["experiencetitle"]}>{blok.title || "Title"}</span>
-        </div>
-        <div className={css["experienceitemcontent"]}>
-          {blok.description
-            ? RichTextToHTML({ document: blok.description })
-            : "No description available"}
-        </div>
-      </div>
-    );
-  }
+	render() {
+		return (
+			<>
+				<div></div>
+				<div {...storyblokEditable(this.props.blok)} className={css["experienceitem"]}>
+					<div className={css["experienceheader"]}>
+						<span className={css["experiencedate"]}>{this.props.blok.startdate} - {this.props.blok.enddate}</span>
+						<span className={css["experiencetitle"]}>{this.props.blok.title}</span>
+					</div>
+					<div className={css["experienceitemcontent"]}>
+						{RichTextToHTML({ document: this.props.blok.description })}
+					</div>
+				</div>
+			</>
+		);
+	}
 }
