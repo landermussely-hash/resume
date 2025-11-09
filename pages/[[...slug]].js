@@ -24,7 +24,13 @@ export default function Page({ story, preview, socialtags }) {
 }
 
 export async function getStaticProps({ params }) {
+  // Root / gaat naar home
   const slug = params.slug ? params.slug.join("/") : "home";
+
+  // Voorkom fetch van statische assets zoals favicon
+  if (slug === "favicon.ico" || slug === "favicon.png") {
+    return { notFound: true };
+  }
 
   const sbParams = {
     version: "draft",
@@ -37,7 +43,15 @@ export async function getStaticProps({ params }) {
     const { data } = await storyblokApi.get(`cdn/stories/${slug}`, sbParams);
 
     if (!data || !data.story) {
-      return { notFound: true }; // 404 fallback
+      // fallback content voor niet-bestaande pagina
+      return {
+        props: {
+          story: {
+            content: { component: "PageNotFound", text: "This page does not exist." }
+          },
+          socialtags: {}
+        }
+      };
     }
 
     const title = data.story.name;
@@ -62,7 +76,14 @@ export async function getStaticProps({ params }) {
     };
   } catch (err) {
     console.error("Storyblok fetch failed for slug:", slug, err.message);
-    return { notFound: true }; // 404 fallback
+    return {
+      props: {
+        story: {
+          content: { component: "PageNotFound", text: "This page does not exist." }
+        },
+        socialtags: {}
+      }
+    };
   }
 }
 
@@ -73,7 +94,10 @@ export async function getStaticPaths() {
     const { data } = await storyblokApi.get("cdn/links/");
 
     const paths = Object.keys(data.links)
-      .filter(linkKey => !data.links[linkKey].is_folder)
+      .filter(linkKey => {
+        const slug = data.links[linkKey].slug;
+        return !data.links[linkKey].is_folder && slug !== "favicon.ico" && slug !== "favicon.png";
+      })
       .map(linkKey => ({
         params: { slug: data.links[linkKey].slug.split("/") }
       }));
