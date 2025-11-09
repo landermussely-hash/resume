@@ -3,10 +3,17 @@ import HeadComponent from "../components/genericComponents/HeadComponent/HeadCom
 import { getTags } from "../functions/services/metaTagService";
 
 export default function Page({ story, preview, socialtags }) {
-  story = useStoryblokState(story, { //Hook that connects the current page to the Storyblok Real Time visual editor. Needs information about the relations in order for the relations to be editable as well.
-    resolveRelations: [
-    ]
-  }, preview);
+  story = useStoryblokState(
+    story,
+    {
+      resolveRelations: []
+    },
+    preview
+  );
+
+  if (!story) {
+    return <div>Page not found</div>; // fallback voor client-side rendering
+  }
 
   return (
     <>
@@ -16,66 +23,70 @@ export default function Page({ story, preview, socialtags }) {
   );
 }
 
-
 export async function getStaticProps({ params }) {
-  let slug = params.slug ? params.slug.join("/") : "home";
+  const slug = params.slug ? params.slug.join("/") : "home";
 
-  let sbParams = {
-    version: "draft", // 'draft' or 'published'
-    resolve_relations: [
-      
-    ]
+  const sbParams = {
+    version: "draft",
+    resolve_relations: []
   };
 
   const storyblokApi = getStoryblokApi();
 
-  let { data } = await storyblokApi.get(`cdn/stories/${slug}`, sbParams);
-  if (!data) {
+  try {
+    const { data } = await storyblokApi.get(`cdn/stories/${slug}`, sbParams);
+
+    if (!data || !data.story) {
+      return { notFound: true }; // 404 fallback
+    }
+
+    const title = data.story.name;
+    const description = data.story.content.tagline || title;
+
+    const socialtags = getTags({
+      storyblokSocialTag: data.story.content.socialtag,
+      pageDefaults: {
+        "og:title": title,
+        "og:description": description,
+        "og:url": `${process.env.NEXT_PUBLIC_DEPLOY_URL}${slug}`
+      }
+    });
+
     return {
-      notFound: true,
-    }
+      props: {
+        story: data.story,
+        key: data.story.id,
+        socialtags
+      },
+      revalidate: 10
+    };
+  } catch (err) {
+    console.error("Storyblok fetch failed for slug:", slug, err.message);
+    return { notFound: true }; // 404 fallback
   }
-
-  const title = data.story.name;
-  const description = data.story.content.tagline ? data.story.content.tagline : `${title}`;
-  const socialtags = getTags({
-    storyblokSocialTag: data.story.content.socialtag,
-    pageDefaults: {
-      "og:title": title,
-      "og:description": description,
-      "og:url": `${process.env.NEXT_PUBLIC_DEPLOY_URL}`+slug
-    }
-  });
-
-  return {
-    props: {
-      story: data ? data.story : false,
-      key: data ? data.story.id : false,
-      socialtags
-    },
-    revalidate: 10,
-  };
 }
 
 export async function getStaticPaths() {
   const storyblokApi = getStoryblokApi();
 
-  let { data } = await storyblokApi.get("cdn/links/");
+  try {
+    const { data } = await storyblokApi.get("cdn/links/");
 
-  let paths = [];
-  Object.keys(data.links).forEach((linkKey) => {
-    if (data.links[linkKey].is_folder) {
-      return;
-    }
+    const paths = Object.keys(data.links)
+      .filter(linkKey => !data.links[linkKey].is_folder)
+      .map(linkKey => ({
+        params: { slug: data.links[linkKey].slug.split("/") }
+      }));
 
-    const slug = data.links[linkKey].slug;
-    let splittedSlug = slug.split("/");
-
-    paths.push({ params: { slug: splittedSlug } });
-  });
-
-  return {
-    paths: paths,
-    fallback: 'blocking'
-  };
+    return {
+      paths,
+      fallback: "blocking"
+    };
+  } catch (err) {
+    console.error("Storyblok links fetch failed", err.message);
+    return {
+      paths: [],
+      fallback: "blocking"
+    };
+  }
 }
