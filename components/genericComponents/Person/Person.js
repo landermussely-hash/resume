@@ -10,8 +10,8 @@ export default class Person extends Component {
 	render() {
 		const { blok } = this.props;
 
-		// ✅ Debug: toon alle data in de console
-		console.log("Person blok data:", blok);
+		// ✅ Debug: check of experiences data binnenkomt
+		console.log("Experiences for", blok.firstname, blok.lastname, ":", blok.experiences);
 
 		return (
 			<div {...storyblokEditable(blok)} className={css["wrapper"]}>
@@ -27,9 +27,9 @@ export default class Person extends Component {
 					{/* Sidebar */}
 					<div className={[css["box"], css["sidebar"]].join(" ")}>
 						<div className={css["personalimage"]}>
-							{blok.image?.filename ? (
+							{blok.image ? (
 								<img
-									src={blok.image.filename}
+									src={blok.image}
 									alt={`${blok.firstname} ${blok.lastname}`}
 								/>
 							) : (
